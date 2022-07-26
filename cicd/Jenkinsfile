@@ -33,16 +33,17 @@ pipeline {
             steps {
                 script {
                     try {
-                        dir("$WORKSPACE/k8s") {
-                            sh 'kubectl apply -f student-app-client-deployment.yaml'
-                            sh 'kubectl apply -f student-app-client-service.yaml'
-                            sh 'kubectl apply -f mongo-persistent-volume-claim.yaml'
-                            sh 'kubectl apply -f mongo-deployment.yaml'
-                            sh 'kubectl apply -f mongo-service.yaml'
-                            sh 'kubectl apply -f student-app-api-deployment.yaml'
-                            sh 'kubectl apply -f student-app-api-service.yaml'
-                            sh 'kubectl apply -f student-app-ingress.yaml'
+                        dir("$WORKSPACE/cicd") {
+                            // sh 'kubectl apply -f student-app-client-deployment.yaml'
+                            // sh 'kubectl apply -f student-app-client-service.yaml'
+                            // sh 'kubectl apply -f mongo-persistent-volume-claim.yaml'
+                            // sh 'kubectl apply -f mongo-deployment.yaml'
+                            // sh 'kubectl apply -f mongo-service.yaml'
+                            // sh 'kubectl apply -f student-app-api-deployment.yaml'
+                            // sh 'kubectl apply -f student-app-api-service.yaml'
+                            // sh 'kubectl apply -f student-app-ingress.yaml'
                             // sh 'kubectl port-forward --address 0.0.0.0 service/ingress-nginx-controller -n ingress-nginx 8080:80 &'
+                            sh 'helm install lonedemo demo-application'
                             currentBuild.result = "SUCCESS" 
                         }
                     } catch (e) {
