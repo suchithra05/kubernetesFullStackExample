@@ -43,7 +43,7 @@ pipeline {
                             // sh 'kubectl apply -f student-app-api-service.yaml'
                             // sh 'kubectl apply -f student-app-ingress.yaml'
                             // sh 'kubectl port-forward --address 0.0.0.0 service/ingress-nginx-controller -n ingress-nginx 8080:80 &'
-                            sh 'helm install lonedemo demo-application'
+                            sh 'helm install lonedemo ./demo-application/'
                             currentBuild.result = "SUCCESS" 
                         }
                     } catch (e) {
