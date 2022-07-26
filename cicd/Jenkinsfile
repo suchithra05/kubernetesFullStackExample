@@ -1,0 +1,60 @@
+pipeline {
+    agent {
+        node {
+            label 'srv-minikube'
+            // customWorkspace '/home/ubuntu'
+        }
+    }
+	stages {
+        stage('Git Clone') {
+            steps {
+                script{
+                    checkout([
+                        $class: 'GitSCM', 
+                        branches: [[name: "main"]], 
+                        doGenerateSubmoduleConfigurations: false,
+                        extensions: [[$class: 'CleanCheckout']], 
+                        submoduleCfg: [], 
+                        userRemoteConfigs: [[url: "https://github.com/RamBoddapati/kubernetesFullStackExample.git"]]
+                        ])
+                }
+            }
+        }
+        stage('Testing the Agent response') {
+            steps {
+                // script{
+                    echo 'You are my catcher'
+                    sh 'ls'
+                    sh 'pwd'
+                // }
+            }
+        }
+        stage('Deploy containerized application') {
+            steps {
+                script {
+                    try {
+                        dir("$WORKSPACE/k8s") {
+                            sh 'kubectl apply -f student-app-client-deployment.yaml'
+                            sh 'kubectl apply -f student-app-client-service.yaml'
+                            sh 'kubectl apply -f mongo-persistent-volume-claim.yaml'
+                            sh 'kubectl apply -f mongo-deployment.yaml'
+                            sh 'kubectl apply -f mongo-service.yaml'
+                            sh 'kubectl apply -f student-app-api-deployment.yaml'
+                            sh 'kubectl apply -f student-app-api-service.yaml'
+                            sh 'kubectl apply -f student-app-ingress.yaml'
+                            // sh 'kubectl port-forward --address 0.0.0.0 service/ingress-nginx-controller -n ingress-nginx 8080:80 &'
+                            currentBuild.result = "SUCCESS" 
+                        }
+                    } catch (e) {
+                        currentBuild.result = "FAILED"
+                        throw e
+                    } finally {
+                        // Success or failure, always send notifications
+                        echo "The containerized application is been run. The result is: ${currentBuild.result}"
+                        
+                    }
+                }
+            }
+        }
+    }
+}

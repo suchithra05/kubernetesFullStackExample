@@ -1,0 +1,47 @@
+# Default values for demo-application.
+# This is a YAML-formatted file.
+# Declare name/value pairs to be passed into your templates.
+# name: value
+
+## Client Service
+client:
+  enabled: true
+  name: student-app-client
+  replicas: 1
+  image: nirajsonawane/student-app-client
+  containerPort: 80
+clientSvc:
+  enabled: true
+  name: student-app-client-service
+  port: 80
+  protocol: TCP
+  type: ClusterIP
+
+## Mongo Service
+mongo:
+  enabled: true
+  name: mongo
+  image: mongo:3.6.17-xenial
+  containerPort: 27017
+mongoSvc:
+  enabled: true
+  name: mongo
+  port: 27017
+mongoPvc:
+  enabled: true
+  name: mongo-pvc
+  storage: 256Mi
+
+## Api Service
+api:
+  enabled: true
+  name: student-app-api
+  replicas: 1
+  image: nirajsonawane/student-app-api:0.0.1-SNAPSHOT
+  containerPort: 8080
+apiSvc:
+  enabled: true
+  name: student-app-api
+  port: 8080
+  protocol: TCP
+

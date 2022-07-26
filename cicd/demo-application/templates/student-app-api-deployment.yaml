@@ -1,0 +1,23 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.api.name }}
+spec:
+  selector:
+    matchLabels:
+      app: {{ .Values.api.name }}
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.api.name }}
+    spec:
+      containers:
+        - name: {{ .Values.api.name }}
+          image: {{ .Values.api.image }}
+          imagePullPolicy: Always
+          ports:
+            - containerPort: {{ .Values.api.containerPort }}
+          env:
+            - name: MONGO_URL
+              value: mongodb://mongo:27017/dev

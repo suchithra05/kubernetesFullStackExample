@@ -1,0 +1,21 @@
+{{- if .Values.client.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.client.name }}
+spec:
+  selector:
+    matchLabels:
+      app: {{ .Values.client.name }}
+  replicas: {{ .Values.client.replicas }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.client.name }}
+    spec:
+      containers:
+        - name: {{ .Values.client.name }}
+          image: {{ .Values.client.image }}
+          imagePullPolicy: Always
+          ports:
+            - containerPort: {{ .Values.client.containerPort }}
