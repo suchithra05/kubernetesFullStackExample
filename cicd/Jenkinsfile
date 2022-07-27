@@ -43,6 +43,7 @@ pipeline {
                             // sh 'kubectl apply -f student-app-api-service.yaml'
                             // sh 'kubectl apply -f student-app-ingress.yaml'
                             // sh 'kubectl port-forward --address 0.0.0.0 service/ingress-nginx-controller -n ingress-nginx 8080:80 &'
+                            sh 'kubectl label namespace default istio-injection=enabled'
                             sh 'helm install demoapp ./demo-application/'
                             sh 'helm install demoprometheus ./demo-prometheus/'
                             sh 'helm install demografana ./demo-grafana/'
@@ -53,7 +54,6 @@ pipeline {
                         }
                     } catch (e) {
                         currentBuild.result = "FAILED"
-                        sh 'kubectl label namespace default istio-injection=enabled --overwrite'
                         sh 'helm uninstall demoapp'
                         sh 'helm uninstall demoprometheus'
                         sh 'helm uninstall demografana'
