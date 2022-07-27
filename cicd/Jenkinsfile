@@ -53,6 +53,7 @@ pipeline {
                         }
                     } catch (e) {
                         currentBuild.result = "FAILED"
+                        sh 'kubectl label namespace default istio-injection=enabled --overwrite'
                         sh 'helm uninstall demoapp'
                         sh 'helm uninstall demoprometheus'
                         sh 'helm uninstall demografana'
