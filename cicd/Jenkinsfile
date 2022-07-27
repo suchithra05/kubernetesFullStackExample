@@ -53,7 +53,12 @@ pipeline {
                         }
                     } catch (e) {
                         currentBuild.result = "FAILED"
+                        sh 'helm uninstall demoapp'
+                        sh 'helm uninstall demoprometheus'
+                        sh 'helm uninstall demografana'
                         sh 'kubectl delete namespace istio-system'
+                        sh 'helm uninstall istio-base -n istio-system'
+                        sh 'helm uninstall istiod -n istio-system'
                         throw e
                     } finally {
                         // Success or failure, always send notifications
