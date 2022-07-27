@@ -1,3 +1,4 @@
+{{- if .Values.ingress.enabled }}
 #apiVersion: networking.k8s.io/v1beta1 # for versions before 1.14 use extensions/v1beta1
 apiVersion: networking.k8s.io/v1
 kind: Ingress
@@ -13,13 +14,14 @@ spec:
           pathType: ImplementationSpecific
           backend:
             service:
-              name: student-app-client-service
+              name: {{ .Values.clientSvc.name }}
               port: 
-                number: 80
+                number: {{ .Values.api.port }}
         - path: /api/?(.*)
           pathType: ImplementationSpecific
           backend:
             service:
-              name: student-app-api
+              name: {{ .Values.apiSvc.name }}
               port: 
-                number: 8080
+                number: {{ .Values.apiSvc.port }}
+{{- end }}

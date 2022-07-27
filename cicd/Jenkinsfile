@@ -43,9 +43,12 @@ pipeline {
                             // sh 'kubectl apply -f student-app-api-service.yaml'
                             // sh 'kubectl apply -f student-app-ingress.yaml'
                             // sh 'kubectl port-forward --address 0.0.0.0 service/ingress-nginx-controller -n ingress-nginx 8080:80 &'
-                            sh 'helm install lonedemo ./demo-application/'
-                            sh 'helm install demoprom ./demo-prometheus/'
-                            sh 'helm install demograf ./demo-grafana/'
+                            sh 'helm install demoapp ./demo-application/'
+                            sh 'helm install demoprometheus ./demo-prometheus/'
+                            sh 'helm install demografana ./demo-grafana/'
+                            sh 'kubectl create namespace istio-system'
+                            sh 'helm install istio-base ./demo-istio/base/ -n istio-system'
+                            sh 'helm install istiod ./demo-istio/istiod/ -n istio-system'
                             currentBuild.result = "SUCCESS" 
                         }
                     } catch (e) {

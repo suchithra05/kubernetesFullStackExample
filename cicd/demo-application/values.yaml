@@ -45,3 +45,7 @@ apiSvc:
   port: 8080
   protocol: TCP
 
+## Ingress Service
+ingress:
+  enabled: true
+  name: student-app-ingress
