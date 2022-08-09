@@ -27,7 +27,7 @@ pipeline {
         stage('Testing the Agent response') {
             steps {
                 // script{
-                    echo 'Inside agent'
+                    echo 'Inside agent machine'
                     sh 'ls'
                     sh 'pwd'
                 // }
