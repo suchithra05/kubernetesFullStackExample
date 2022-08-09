@@ -159,7 +159,7 @@ pipeline {
                             sh 'helm upgrade demoapp ./demo-application/ --install --atomic --set client.image=${DockerUser}/react:v${BUILD_NUMBER},api.image=${DockerUser}/spring:v${BUILD_NUMBER}'
                             sh 'helm upgrade demoprometheus ./demo-prometheus/ --install --atomic'
                             sh 'helm upgrade demografana ./demo-grafana/ --install --atomic'
-                            sh 'kubectl create namespace istio-system'
+                            // sh 'kubectl create namespace istio-system'
                             sh 'helm upgrade istio-base ./demo-istio/base/ -n istio-system --install --atomic'
                             sh 'helm upgrade istiod ./demo-istio/istio-control/istio-discovery/ -n istio-system --install --atomic'
                             currentBuild.result = "SUCCESS" 
@@ -171,7 +171,7 @@ pipeline {
                         sh 'helm uninstall demografana'
                         sh 'helm uninstall istio-base -n istio-system'
                         sh 'helm uninstall istiod -n istio-system'
-                        sh 'kubectl delete namespace istio-system'
+                        // sh 'kubectl delete namespace istio-system'
                         throw e
                     } finally {
                         // Success or failure, always send notifications
