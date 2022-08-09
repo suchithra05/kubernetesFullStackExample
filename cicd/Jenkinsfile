@@ -5,6 +5,10 @@ pipeline {
             // customWorkspace '/home/ubuntu'
         }
     }
+    parameters {
+        string(name: 'DockerUser', defaultValue: '', description: 'Docker user to push images to Docker Hub')
+        password(name: 'DockerUserPassword', defaultValue: '', description: 'Docker user\'s password to push images to Docker Hub')
+    }
 	stages {
         stage('Git Clone') {
             steps {
@@ -29,6 +33,114 @@ pipeline {
                 // }
             }
         }
+        stage('Login to DockerHub') {
+            steps {
+                script {
+                    try {
+                        dir("$WORKSPACE") {
+                            sh 'docker login --username ${DockerUser} --password ${DockerUserPassword}'
+                            currentBuild.result = "SUCCESS" 
+                        }
+                    } catch (e) {
+                        currentBuild.result = "FAILED"
+                        throw e
+                    } finally {
+                        // Success or failure, always send notifications
+                        echo "The stage \"Login to DockerHub\" is been run. The result is: ${currentBuild.result}"   
+                    }
+                }
+            }
+        }
+        stage('Containerize the frontend application') {
+            steps {
+                script {
+                    try {
+                        dir("$WORKSPACE/react-student-management-web-app") {
+                            sh 'docker image build -t ${DockerUser}/react:v${BUILD_NUMBER} .'
+                            currentBuild.result = "SUCCESS" 
+                        }
+                    } catch (e) {
+                        currentBuild.result = "FAILED"
+                        throw e
+                    } finally {
+                        // Success or failure, always send notifications
+                        echo "The stage \"Containerize the frontend application\" is been run. The result is: ${currentBuild.result}"   
+                    }
+                }
+            }
+        }
+        stage('Push frontend app image to DockerHub') {
+            steps {
+                script {
+                    try {
+                        dir("$WORKSPACE") {
+                            sh 'docker image push ${DockerUser}/react:v${BUILD_NUMBER}'
+                            currentBuild.result = "SUCCESS" 
+                        }
+                    } catch (e) {
+                        currentBuild.result = "FAILED"
+                        throw e
+                    } finally {
+                        // Success or failure, always send notifications
+                        echo "The stage \"Push frontend app image to DockerHub\" is been run. The result is: ${currentBuild.result}"   
+                    }
+                }
+            }
+        }
+        stage('Build the backend application') {
+            steps {
+                script {
+                    try {
+                        dir("$WORKSPACE/spring-boot-student-app-api") {
+                            sh 'mvn clean package'
+                            currentBuild.result = "SUCCESS" 
+                        }
+                    } catch (e) {
+                        currentBuild.result = "FAILED"
+                        throw e
+                    } finally {
+                        // Success or failure, always send notifications
+                        echo "The stage \"Build the backend application\" is been run. The result is: ${currentBuild.result}"   
+                    }
+                }
+            }
+        }
+        stage('Containerize the backend application') {
+            steps {
+                script {
+                    try {
+                        dir("$WORKSPACE/spring-boot-student-app-api") {
+                            sh 'docker image build -t ${DockerUser}/spring:v${BUILD_NUMBER} .'
+                            currentBuild.result = "SUCCESS" 
+                        }
+                    } catch (e) {
+                        currentBuild.result = "FAILED"
+                        throw e
+                    } finally {
+                        // Success or failure, always send notifications
+                        echo "The stage \"Containerize the backend application\" is been run. The result is: ${currentBuild.result}"   
+                    }
+                }
+            }
+        }
+        stage('Push backend app image to DockerHub') {
+            steps {
+                script {
+                    try {
+                        dir("$WORKSPACE") {
+                            sh 'docker image push ${DockerUser}/spring:v${BUILD_NUMBER}'
+                            currentBuild.result = "SUCCESS" 
+                        }
+                    } catch (e) {
+                        currentBuild.result = "FAILED"
+                        throw e
+                    } finally {
+                        // Success or failure, always send notifications
+                        echo "The stage \"Push backend app image to DockerHub\" is been run. The result is: ${currentBuild.result}"   
+                    }
+                }
+            }
+        }
         stage('Deploy containerized application') {
             steps {
                 script {
@@ -44,12 +156,12 @@ pipeline {
                             // sh 'kubectl apply -f student-app-ingress.yaml'
                             // sh 'kubectl port-forward --address 0.0.0.0 service/ingress-nginx-controller -n ingress-nginx 8080:80 &'
                             sh 'kubectl label namespace default istio-injection=enabled --overwrite'
-                            sh 'helm install demoapp ./demo-application/'
-                            sh 'helm install demoprometheus ./demo-prometheus/'
-                            sh 'helm install demografana ./demo-grafana/'
+                            sh 'helm upgrade demoapp ./demo-application/ --install --atomic --set client.image=${DockerUser}/react:v${BUILD_NUMBER},api.image=${DockerUser}/spring:v${BUILD_NUMBER}'
+                            sh 'helm upgrade demoprometheus ./demo-prometheus/ --install --atomic'
+                            sh 'helm upgrade demografana ./demo-grafana/ --install --atomic'
                             sh 'kubectl create namespace istio-system'
-                            sh 'helm install istio-base ./demo-istio/base/ -n istio-system'
-                            sh 'helm install istiod ./demo-istio/istio-control/istio-discovery/ -n istio-system'
+                            sh 'helm upgrade istio-base ./demo-istio/base/ -n istio-system --install --atomic'
+                            sh 'helm upgrade istiod ./demo-istio/istio-control/istio-discovery/ -n istio-system --install --atomic'
                             currentBuild.result = "SUCCESS" 
                         }
                     } catch (e) {
@@ -57,14 +169,13 @@ pipeline {
                         sh 'helm uninstall demoapp'
                         sh 'helm uninstall demoprometheus'
                         sh 'helm uninstall demografana'
-                        sh 'kubectl delete namespace istio-system'
                         sh 'helm uninstall istio-base -n istio-system'
                         sh 'helm uninstall istiod -n istio-system'
+                        sh 'kubectl delete namespace istio-system'
                         throw e
                     } finally {
                         // Success or failure, always send notifications
-                        echo "The containerized application is been run. The result is: ${currentBuild.result}"
-                        
+                        echo "The containerized application is been run. The result is: ${currentBuild.result}"   
                     }
                 }
             }
