@@ -5,9 +5,9 @@ pipeline {
             // customWorkspace '/home/ubuntu'
         }
     }
-    parameters {
-        string(name: 'DockerUser', defaultValue: '', description: 'Docker user to push images to Docker Hub')
-        password(name: 'DockerUserPassword', defaultValue: '', description: 'Docker user\'s password to push images to Docker Hub')
+    environment {
+        DockerUser     = credentials('DockerUser')
+        DockerUserPassword = credentials('DockerUserPassword')
     }
 	stages {
         stage('Git Clone') {
