@@ -27,7 +27,7 @@ pipeline {
         stage('Testing the Agent response') {
             steps {
                 // script{
-                    echo 'You are my catcher'
+                    echo 'Inside agent'
                     sh 'ls'
                     sh 'pwd'
                 // }
