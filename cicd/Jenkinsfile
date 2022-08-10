@@ -1,7 +1,7 @@
 pipeline {
     agent {
         node {
-            label 'srv-minikube'
+            label 'minikube'
             // customWorkspace '/home/ubuntu'
         }
     }
@@ -19,7 +19,7 @@ pipeline {
                         doGenerateSubmoduleConfigurations: false,
                         extensions: [[$class: 'CleanCheckout']], 
                         submoduleCfg: [], 
-                        userRemoteConfigs: [[url: "https://github.com/RamBoddapati/kubernetesFullStackExample.git"]]
+                        userRemoteConfigs: [[url: "https://github.com/Pavankumarnani/kubernetesFullStackExample.git"]]
                         ])
                 }
             }
